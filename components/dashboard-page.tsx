@@ -64,7 +64,10 @@ function MapPin3D({ incident, onClick, isSelected }: { incident: Incident; onCli
     >
       {/* Pulse animation for critical incidents */}
       {incident.severity === 'critical' && (
-        <span className="absolute inset-0 animate-ping rounded-full bg-critical/40" style={{ animationDuration: '1.5s' }} />
+        <span
+          className="absolute inset-0 motion-reduce:animate-none animate-ping rounded-full bg-critical/40"
+          style={{ animationDuration: '1.5s' }}
+        />
       )}
       
       <div className={cn(
@@ -115,7 +118,7 @@ function FilterPanel({
   if (!isOpen) return null;
 
   return (
-    <div className="absolute right-4 top-4 z-30 w-72 rounded-2xl border border-border bg-card p-4 shadow-2xl">
+    <div className="absolute left-2 right-2 top-14 z-30 max-h-[min(75dvh,calc(100dvh-10rem))] w-auto overflow-y-auto rounded-2xl border border-border bg-card p-4 shadow-2xl sm:left-auto sm:right-4 sm:top-4 sm:max-h-[calc(100dvh-8rem)] sm:w-72 sm:max-w-none">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-bold">{language === 'en' ? 'Filters' : 'ফিল্টার'}</h3>
         <Button variant="ghost" size="icon" onClick={onClose}>
@@ -211,7 +214,7 @@ function IncidentDetail({ incident, onClose, language }: { incident: Incident | 
   const timeDiff = Math.floor((Date.now() - new Date(incident.timestamp).getTime()) / 60000);
 
   return (
-    <div className="absolute bottom-4 left-4 right-4 z-30 md:left-auto md:w-96">
+    <div className="absolute bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] left-3 right-3 z-30 md:bottom-4 md:left-auto md:right-4 md:w-96">
       <Card className="overflow-hidden border-2" style={{ borderColor: `var(--${incident.severity})` }}>
         <div className={cn("flex items-center gap-3 p-4", severityColors[incident.severity])}>
           <Icon className="h-8 w-8 text-white" />
@@ -273,11 +276,11 @@ function IncidentDetail({ incident, onClose, language }: { incident: Incident | 
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row">
             {incident.status === 'pending' && (
               <Button 
                 onClick={() => updateIncidentStatus(incident.id, 'acknowledged')}
-                className="flex-1 bg-primary"
+                className="w-full bg-primary sm:flex-1"
               >
                 {language === 'en' ? 'Acknowledge' : 'স্বীকার করুন'}
               </Button>
@@ -285,12 +288,12 @@ function IncidentDetail({ incident, onClose, language }: { incident: Incident | 
             {incident.status === 'acknowledged' && (
               <Button 
                 onClick={() => updateIncidentStatus(incident.id, 'resolved')}
-                className="flex-1 bg-safe text-safe-foreground hover:bg-safe/90"
+                className="w-full bg-safe text-safe-foreground hover:bg-safe/90 sm:flex-1"
               >
                 {language === 'en' ? 'Mark Resolved' : 'সমাধান চিহ্নিত করুন'}
               </Button>
             )}
-            <Button variant="outline" className="flex-1">
+            <Button variant="outline" className="w-full sm:flex-1">
               {language === 'en' ? 'Dispatch Team' : 'দল প্রেরণ করুন'}
             </Button>
           </div>
@@ -336,33 +339,34 @@ export function DashboardPage() {
   }), [filteredIncidents]);
 
   return (
-    <div className="relative flex h-[calc(100vh-120px)] flex-col">
+    <div className="relative flex h-[calc(100dvh-7.25rem)] min-h-[280px] flex-col sm:h-[calc(100vh-120px)]">
       {/* Stats Bar */}
-      <div className="flex items-center gap-4 border-b border-border bg-card px-4 py-3">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl font-bold">{stats.total}</span>
-          <span className="text-sm text-muted-foreground">
+      <div className="flex items-center gap-2 overflow-x-auto border-b border-border bg-card px-3 py-2 [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-4 sm:px-4 sm:py-3 [&::-webkit-scrollbar]:hidden">
+        <div className="flex shrink-0 items-center gap-2">
+          <span className="text-xl font-bold sm:text-2xl">{stats.total}</span>
+          <span className="text-xs text-muted-foreground sm:text-sm">
             {language === 'en' ? 'Incidents' : 'ঘটনা'}
           </span>
         </div>
-        <div className="h-6 w-px bg-border" />
-        <div className="flex items-center gap-2">
-          <span className="h-3 w-3 rounded-full bg-critical" />
-          <span className="text-sm font-medium">{stats.critical} {language === 'en' ? 'Critical' : 'জটিল'}</span>
+        <div className="hidden h-6 w-px shrink-0 bg-border sm:block" />
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-critical sm:h-3 sm:w-3" />
+          <span className="whitespace-nowrap text-xs font-medium sm:text-sm">{stats.critical} {language === 'en' ? 'Critical' : 'জটিল'}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="h-3 w-3 rounded-full bg-warning" />
-          <span className="text-sm font-medium">{stats.pending} {language === 'en' ? 'Pending' : 'অপেক্ষারত'}</span>
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-warning sm:h-3 sm:w-3" />
+          <span className="whitespace-nowrap text-xs font-medium sm:text-sm">{stats.pending} {language === 'en' ? 'Pending' : 'অপেক্ষারত'}</span>
         </div>
-        <div className="ml-auto">
+        <div className="ml-auto shrink-0 pl-2">
           <Button
             variant={showFilters ? "default" : "outline"}
             size="sm"
             onClick={() => setShowFilters(!showFilters)}
             className="gap-2"
+            aria-label={language === 'en' ? 'Filters' : 'ফিল্টার'}
           >
             <Filter className="h-4 w-4" />
-            {language === 'en' ? 'Filters' : 'ফিল্টার'}
+            <span className="hidden sm:inline">{language === 'en' ? 'Filters' : 'ফিল্টার'}</span>
           </Button>
         </div>
       </div>
@@ -420,7 +424,7 @@ export function DashboardPage() {
         />
 
         {/* Legend */}
-        <div className="absolute bottom-4 left-4 z-20 rounded-xl bg-card/90 p-3 backdrop-blur-sm">
+        <div className="absolute bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] left-2 z-20 max-w-[40%] rounded-xl bg-card/90 p-2 backdrop-blur-sm sm:bottom-4 sm:left-4 sm:max-w-none sm:p-3">
           <p className="mb-2 text-xs font-medium text-muted-foreground">
             {language === 'en' ? 'SEVERITY' : 'তীব্রতা'}
           </p>

@@ -94,11 +94,11 @@ export function FeedPage() {
   }, [incidents]);
 
   return (
-    <div className="min-h-screen pb-24 pt-4">
+    <div className="min-h-screen pb-[calc(6rem+env(safe-area-inset-bottom,0px))] pt-3 sm:pt-4">
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between px-4">
-        <div>
-          <h2 className="text-2xl font-bold">
+      <div className="mb-6 flex flex-col gap-4 px-3 sm:flex-row sm:items-start sm:justify-between sm:gap-6 sm:px-4">
+        <div className="min-w-0">
+          <h2 className="text-xl font-bold sm:text-2xl">
             {language === 'en' ? 'Activity Feed' : 'কার্যকলাপ ফিড'}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -107,33 +107,35 @@ export function FeedPage() {
               : 'মাঠ থেকে রিয়েল-টাইম আপডেট'}
           </p>
         </div>
-        <LanguageToggle />
+        <div className="shrink-0 self-end sm:self-auto">
+          <LanguageToggle />
+        </div>
       </div>
 
       {/* Live Stats Banner */}
-      <div className="mx-4 mb-6 grid grid-cols-3 gap-3">
-        <Card className="p-4 text-center">
-          <p className="text-3xl font-bold text-primary">{stats.totalIncidents}</p>
-          <p className="mt-1 text-xs text-muted-foreground">
+      <div className="mx-3 mb-6 grid grid-cols-3 gap-2 sm:mx-4 sm:gap-3">
+        <Card className="p-3 text-center sm:p-4">
+          <p className="text-2xl font-bold text-primary sm:text-3xl">{stats.totalIncidents}</p>
+          <p className="mt-1 text-[10px] text-muted-foreground sm:text-xs">
             {language === 'en' ? 'Total Reports' : 'মোট রিপোর্ট'}
           </p>
         </Card>
-        <Card className="p-4 text-center">
-          <p className="text-3xl font-bold text-warning">{stats.lastHourIncidents}</p>
-          <p className="mt-1 text-xs text-muted-foreground">
+        <Card className="p-3 text-center sm:p-4">
+          <p className="text-2xl font-bold text-warning sm:text-3xl">{stats.lastHourIncidents}</p>
+          <p className="mt-1 text-[10px] text-muted-foreground sm:text-xs">
             {language === 'en' ? 'Last Hour' : 'শেষ ঘন্টা'}
           </p>
         </Card>
-        <Card className="p-4 text-center">
-          <p className="text-3xl font-bold text-critical">{stats.criticalActive}</p>
-          <p className="mt-1 text-xs text-muted-foreground">
+        <Card className="p-3 text-center sm:p-4">
+          <p className="text-2xl font-bold text-critical sm:text-3xl">{stats.criticalActive}</p>
+          <p className="mt-1 text-[10px] text-muted-foreground sm:text-xs">
             {language === 'en' ? 'Critical' : 'জটিল'}
           </p>
         </Card>
       </div>
 
       {/* Filter Tabs */}
-      <div className="mb-6 flex items-center gap-2 overflow-x-auto px-4">
+      <div className="mb-6 flex items-center gap-2 overflow-x-auto px-3 pb-1 sm:px-4">
         {[
           { id: 'all', label: { en: 'All', bn: 'সব' } },
           { id: 'incident', label: { en: 'Incidents', bn: 'ঘটনা' } },
@@ -161,7 +163,7 @@ export function FeedPage() {
       </div>
 
       {/* Activity Feed */}
-      <div className="space-y-4 px-4">
+      <div className="space-y-4 px-3 sm:px-4">
         {filteredActivities.length === 0 ? (
           <Card className="flex flex-col items-center justify-center p-8 text-center">
             <Filter className="mb-3 h-12 w-12 text-muted-foreground/50" />
@@ -253,7 +255,7 @@ export function FeedPage() {
 
       {/* Load More */}
       {filteredActivities.length > 0 && (
-        <div className="mt-6 px-4">
+        <div className="mt-6 px-3 sm:px-4">
           <Button variant="outline" className="w-full">
             {language === 'en' ? 'Load More' : 'আরও লোড করুন'}
           </Button>

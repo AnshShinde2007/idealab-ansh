@@ -159,11 +159,11 @@ export function AlertsPage() {
   };
 
   return (
-    <div className="min-h-screen pb-24 pt-4">
+    <div className="min-h-screen pb-[calc(6rem+env(safe-area-inset-bottom,0px))] pt-3 sm:pt-4">
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between px-4">
-        <div>
-          <h2 className="text-2xl font-bold">
+      <div className="mb-6 flex flex-col gap-4 px-3 sm:flex-row sm:items-start sm:justify-between sm:gap-6 sm:px-4">
+        <div className="min-w-0">
+          <h2 className="text-xl font-bold sm:text-2xl">
             {language === 'en' ? 'Alert Management' : 'সতর্কতা ব্যবস্থাপনা'}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -172,12 +172,14 @@ export function AlertsPage() {
               : 'ক্ষতিগ্রস্ত অঞ্চলে জরুরি সতর্কতা পাঠান'}
           </p>
         </div>
-        <LanguageToggle />
+        <div className="shrink-0 self-end sm:self-auto">
+          <LanguageToggle />
+        </div>
       </div>
 
       {/* Success Message */}
       {showSuccess && (
-        <div className="mx-4 mb-6 flex items-center gap-3 rounded-xl bg-safe/20 p-4">
+        <div className="mx-3 mb-6 flex items-center gap-3 rounded-xl bg-safe/20 p-4 sm:mx-4">
           <CheckCircle className="h-6 w-6 text-safe" />
           <p className="text-lg font-bold text-safe">
             {language === 'en' ? 'Alert Sent Successfully!' : 'সতর্কতা সফলভাবে পাঠানো হয়েছে!'}
@@ -186,10 +188,10 @@ export function AlertsPage() {
       )}
 
       {/* Create Alert Button */}
-      <div className="mb-6 px-4">
+      <div className="mb-6 px-3 sm:px-4">
         <Button
           onClick={() => setShowCreateAlert(true)}
-          className="w-full gap-3 bg-critical py-6 text-lg font-bold hover:bg-critical/90"
+          className="w-full gap-3 bg-critical py-5 text-base font-bold hover:bg-critical/90 sm:py-6 sm:text-lg"
         >
           <Plus className="h-6 w-6" />
           {language === 'en' ? 'Create New Alert' : 'নতুন সতর্কতা তৈরি করুন'}
@@ -197,7 +199,7 @@ export function AlertsPage() {
       </div>
 
       {/* Active Alerts */}
-      <div className="mb-8 px-4">
+      <div className="mb-8 px-3 sm:px-4">
         <h3 className="mb-4 text-lg font-semibold">
           {language === 'en' ? 'Active Alerts' : 'সক্রিয় সতর্কতা'} ({activeAlerts.length})
         </h3>
@@ -247,7 +249,7 @@ export function AlertsPage() {
 
       {/* Past Alerts */}
       {pastAlerts.length > 0 && (
-        <div className="px-4">
+        <div className="px-3 sm:px-4">
           <h3 className="mb-4 text-lg font-semibold">
             {language === 'en' ? 'Past Alerts' : 'পূর্ববর্তী সতর্কতা'}
           </h3>
@@ -269,8 +271,8 @@ export function AlertsPage() {
 
       {/* Create Alert Modal */}
       {showCreateAlert && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-background/80 backdrop-blur-sm md:items-center">
-          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-card p-6 md:rounded-3xl">
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-background/80 p-0 backdrop-blur-sm sm:p-4 md:items-center">
+          <div className="max-h-[min(92dvh,calc(100dvh-env(safe-area-inset-bottom,0px)-1rem))] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-card p-4 pb-[max(1.5rem,env(safe-area-inset-bottom,0px))] sm:p-6 sm:pb-6 md:rounded-3xl">
             <div className="mb-6 flex items-center justify-between">
               <h3 className="text-xl font-bold">
                 {language === 'en' ? 'Create Alert' : 'সতর্কতা তৈরি করুন'}
@@ -285,7 +287,7 @@ export function AlertsPage() {
               <p className="mb-3 text-sm font-medium text-muted-foreground">
                 {language === 'en' ? 'Quick Templates' : 'দ্রুত টেমপ্লেট'}
               </p>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
                 {quickAlerts.map(alert => {
                   const Icon = alert.icon;
                   return (
@@ -300,7 +302,7 @@ export function AlertsPage() {
                       )}
                     >
                       <Icon className="h-6 w-6" />
-                      <span className="text-xs font-medium">{alert.title[language]}</span>
+                      <span className="line-clamp-2 text-[11px] font-medium leading-tight sm:text-xs">{alert.title[language]}</span>
                     </button>
                   );
                 })}
@@ -343,13 +345,13 @@ export function AlertsPage() {
                   <label className="mb-2 block text-sm font-medium">
                     {language === 'en' ? 'Severity' : 'তীব্রতা'}
                   </label>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:gap-2">
                     {(['critical', 'moderate', 'safe'] as Severity[]).map(sev => (
                       <button
                         key={sev}
                         onClick={() => setCustomSeverity(sev)}
                         className={cn(
-                          "flex-1 rounded-lg py-2 text-sm font-medium transition-all",
+                          "w-full rounded-lg py-2 text-sm font-medium transition-all sm:flex-1",
                           customSeverity === sev ? severityColors[sev] : "bg-secondary text-foreground"
                         )}
                       >
@@ -383,7 +385,7 @@ export function AlertsPage() {
             <Button
               onClick={handleSendAlert}
               disabled={(!selectedQuickAlert && (!customTitle || !customMessage)) || isSending}
-              className="w-full gap-3 bg-critical py-6 text-lg font-bold hover:bg-critical/90"
+              className="w-full gap-3 bg-critical py-5 text-base font-bold hover:bg-critical/90 sm:py-6 sm:text-lg"
             >
               {isSending ? (
                 <span className="animate-spin">
