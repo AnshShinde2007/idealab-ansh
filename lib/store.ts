@@ -39,6 +39,16 @@ interface AppState {
   // User location
   userLocation: Location | null;
   setUserLocation: (location: Location | null) => void;
+
+  // Weather & Storm Telemetry
+  weather: {
+    windSpeed: number;
+    pressure: number;
+    stormCategory: number;
+    distanceToCoast: number;
+    trend: 'rising' | 'stable' | 'falling';
+  };
+  setWeather: (weather: Partial<AppState['weather']>) => void;
 }
 
 const generateId = () => Math.random().toString(36).substring(2, 15);
@@ -261,6 +271,17 @@ export const useStore = create<AppState>()(
 
       userLocation: null,
       setUserLocation: (location) => set({ userLocation: location }),
+
+      weather: {
+        windSpeed: 124,
+        pressure: 982,
+        stormCategory: 3,
+        distanceToCoast: 45,
+        trend: 'rising',
+      },
+      setWeather: (weather) => set((state) => ({ 
+        weather: { ...state.weather, ...weather } 
+      })),
     }),
     {
       name: 'cgsn-storage',

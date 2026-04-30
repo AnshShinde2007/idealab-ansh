@@ -102,9 +102,10 @@ export function Navigation() {
 }
 
 export function Header() {
-  const { isOnline, pendingIncidents, language } = useStore();
+  const { isOnline, pendingIncidents, language, alerts } = useStore();
   const mounted = useMounted();
   const pendingCount = pendingIncidents.length;
+  const criticalCount = alerts.filter(a => a.isActive && a.severity === 'critical').length;
 
   if (!mounted) return null;
 
@@ -113,7 +114,12 @@ export function Header() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-indigo-600 shadow-lg shadow-primary/20">
+            <div className={cn(
+              "flex h-10 w-10 items-center justify-center rounded-2xl transition-all duration-700",
+              criticalCount > 0 
+                ? "bg-critical shadow-[0_0_20px_rgba(var(--critical),0.4)] animate-pulse" 
+                : "bg-gradient-to-br from-primary to-indigo-600 shadow-lg shadow-primary/20"
+            )}>
               <Radio className="h-5 w-5 text-white" />
             </div>
             <div className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-background border-2 border-background">
@@ -124,10 +130,15 @@ export function Header() {
             <div className="flex items-center gap-1.5">
               <h1 className="text-xl font-black tracking-tighter text-white leading-none">CGSN</h1>
               <div className="h-4 w-[1px] bg-white/10" />
-              <Zap className="h-3 w-3 text-primary animate-pulse" />
+              <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-white/5 border border-white/10">
+                 <Zap className={cn("h-3 w-3 animate-pulse", criticalCount > 0 ? "text-critical" : "text-primary")} />
+                 <span className={cn("text-[7px] font-black uppercase tracking-widest", criticalCount > 0 ? "text-critical" : "text-primary")}>
+                    {criticalCount > 0 ? 'Threat Detected' : 'Signal Stable'}
+                 </span>
+              </div>
             </div>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="h-1 w-1 rounded-full bg-emerald-500 animate-pulse" />
+              <span className={cn("h-1 w-1 rounded-full animate-pulse", isOnline ? "bg-emerald-500" : "bg-amber-500")} />
               <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white/50">
                 {language === 'en' ? 'Signal Active' : 'সংকেত সক্রিয়'}
               </span>
@@ -136,6 +147,12 @@ export function Header() {
         </div>
         
         <div className="flex items-center gap-3">
+          {criticalCount > 0 && (
+             <div className="hidden sm:flex items-center gap-2 glass px-3 py-1.5 border-critical/20 animate-pulse">
+                <AlertTriangle className="h-3 w-3 text-critical" />
+                <span className="text-[9px] font-black uppercase tracking-widest text-critical">DEFCON 1</span>
+             </div>
+          )}
           {!isOnline && (
             <div className="glass flex items-center gap-2 rounded-xl px-3 py-1.5 border-amber-500/20">
               <WifiOff className="h-3 w-3 text-amber-500" />
