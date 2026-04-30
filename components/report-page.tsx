@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { LanguageToggle } from '@/components/language-toggle';
 import { NearestShelters } from '@/components/nearest-shelters';
+import { useMounted } from '@/hooks/use-mounted';
 import { 
   Droplets, 
   Zap, 
@@ -40,6 +41,7 @@ const severityButtons = [
 
 export function ReportPage() {
   const { language, isOnline, addIncident, userLocation, setUserLocation, alerts } = useStore();
+  const mounted = useMounted();
   const [selectedType, setSelectedType] = useState<IncidentType | null>(null);
   const [selectedSeverity, setSelectedSeverity] = useState<Severity>('moderate');
   const [isLocating, setIsLocating] = useState(false);
@@ -71,10 +73,10 @@ export function ReportPage() {
   }, [setUserLocation]);
 
   useEffect(() => {
-    if (!userLocation) {
+    if (!userLocation && mounted) {
       detectLocation();
     }
-  }, [userLocation, detectLocation]);
+  }, [userLocation, detectLocation, mounted]);
 
   const handleSubmit = async () => {
     if (!selectedType || !userLocation) return;
@@ -99,6 +101,10 @@ export function ReportPage() {
 
     setTimeout(() => setShowSuccess(false), 4000);
   };
+
+  if (!mounted) {
+    return <div className="min-h-screen bg-background" />;
+  }
 
   return (
     <div className="relative min-h-screen pb-[calc(6rem+env(safe-area-inset-bottom,0px))] pt-3 sm:pt-4 overflow-hidden">
@@ -202,7 +208,7 @@ export function ReportPage() {
                 className={cn(
                   "flex-1 rounded-2xl px-4 py-4 text-xs font-black uppercase tracking-widest transition-all duration-300",
                   selectedSeverity === level
-                    ? `${color} ${level === 'warning' ? 'text-warning-foreground' : 'text-white'} shadow-xl ring-2 ring-offset-2 ring-offset-background`
+                    ? `${color} ${level === 'moderate' ? 'text-warning-foreground' : 'text-white'} shadow-xl ring-2 ring-offset-2 ring-offset-background`
                     : "glass text-muted-foreground"
                 )}
               >
