@@ -17,23 +17,25 @@ import {
   CheckCircle,
   Loader2,
   AlertTriangle,
-  WifiOff
+  WifiOff,
+  Activity,
+  ShieldAlert
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { IncidentType, Severity } from '@/lib/types';
 import { INCIDENT_LABELS, UI_LABELS } from '@/lib/types';
 
 const incidentButtons = [
-  { type: 'flooding' as IncidentType, icon: Droplets, color: 'bg-blue-600 hover:bg-blue-700' },
-  { type: 'power_outage' as IncidentType, icon: Zap, color: 'bg-amber-600 hover:bg-amber-700' },
-  { type: 'tree_fall' as IncidentType, icon: TreeDeciduous, color: 'bg-green-600 hover:bg-green-700' },
-  { type: 'strong_winds' as IncidentType, icon: Wind, color: 'bg-cyan-600 hover:bg-cyan-700' },
+  { type: 'flooding' as IncidentType, icon: Droplets, color: 'from-blue-600 to-blue-800 shadow-blue-900/40' },
+  { type: 'power_outage' as IncidentType, icon: Zap, color: 'from-amber-500 to-amber-700 shadow-amber-900/40' },
+  { type: 'tree_fall' as IncidentType, icon: TreeDeciduous, color: 'from-green-600 to-green-800 shadow-green-900/40' },
+  { type: 'strong_winds' as IncidentType, icon: Wind, color: 'from-cyan-500 to-cyan-700 shadow-cyan-900/40' },
 ];
 
 const severityButtons = [
-  { level: 'critical' as Severity, label: { en: 'Critical', bn: 'জটিল' }, color: 'bg-critical' },
-  { level: 'moderate' as Severity, label: { en: 'Moderate', bn: 'মাঝারি' }, color: 'bg-warning' },
-  { level: 'safe' as Severity, label: { en: 'Low Risk', bn: 'কম ঝুঁকি' }, color: 'bg-safe' },
+  { level: 'critical' as Severity, label: { en: 'Critical', bn: 'জটিল' }, color: 'bg-critical shadow-critical/30' },
+  { level: 'moderate' as Severity, label: { en: 'Moderate', bn: 'মাঝারি' }, color: 'bg-warning shadow-warning/30' },
+  { level: 'safe' as Severity, label: { en: 'Low Risk', bn: 'কম ঝুঁকি' }, color: 'bg-safe shadow-safe/30' },
 ];
 
 export function ReportPage() {
@@ -80,7 +82,7 @@ export function ReportPage() {
     setIsSending(true);
     
     // Simulate network request
-    await new Promise(resolve => setTimeout(resolve, 800));
+    await new Promise(resolve => setTimeout(resolve, 1200));
 
     addIncident({
       type: selectedType,
@@ -95,21 +97,28 @@ export function ReportPage() {
     setDescription('');
     setSelectedSeverity('moderate');
 
-    setTimeout(() => setShowSuccess(false), 3000);
+    setTimeout(() => setShowSuccess(false), 4000);
   };
 
   return (
-    <div className="min-h-screen pb-[calc(6rem+env(safe-area-inset-bottom,0px))] pt-3 sm:pt-4">
+    <div className="relative min-h-screen pb-[calc(6rem+env(safe-area-inset-bottom,0px))] pt-3 sm:pt-4 overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute top-0 right-0 -z-10 h-64 w-64 bg-primary/10 blur-[100px] rounded-full" />
+      <div className="absolute bottom-0 left-0 -z-10 h-64 w-64 bg-critical/5 blur-[100px] rounded-full" />
+      <div className="scan-line" />
+
       {/* Critical Alert Banner */}
       {criticalAlerts.length > 0 && (
-        <div className="mx-3 mb-6 overflow-hidden rounded-2xl bg-critical/20 p-4 sm:mx-4">
+        <div className="mx-3 mb-6 overflow-hidden rounded-2xl bg-critical/10 border border-critical/20 p-4 sm:mx-4 backdrop-blur-md emergency-pulse">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="h-6 w-6 shrink-0 text-critical" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-critical/20 text-critical shadow-lg shadow-critical/20">
+              <ShieldAlert className="h-6 w-6" />
+            </div>
             <div className="flex-1">
-              <p className="font-bold text-critical">
+              <p className="text-xs font-black uppercase tracking-widest text-critical">
                 {language === 'en' ? 'CRITICAL ALERT' : 'জরুরি সতর্কতা'}
               </p>
-              <p className="mt-1 text-sm text-critical/90">
+              <p className="mt-1 text-sm font-medium text-foreground/90 leading-tight">
                 {criticalAlerts[0].message}
               </p>
             </div>
@@ -118,57 +127,61 @@ export function ReportPage() {
       )}
 
       {/* Header with Language Toggle */}
-      <div className="mb-6 flex flex-col gap-4 px-3 sm:flex-row sm:items-start sm:justify-between sm:gap-6 sm:px-4">
-        <div className="min-w-0">
-          <h2 className="text-xl font-bold sm:text-2xl">
-            {language === 'en' ? 'Report Incident' : 'ঘটনা রিপোর্ট করুন'}
+      <div className="mb-6 flex items-center justify-between px-3 sm:px-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <Activity className="h-4 w-4 text-primary animate-pulse" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+              {isOnline ? 'System Live' : 'Offline Mode'}
+            </span>
+          </div>
+          <h2 className="text-2xl font-black tracking-tight sm:text-3xl">
+            {language === 'en' ? 'Report' : 'রিপোর্ট'} <span className="text-primary">{language === 'en' ? 'Incident' : 'ঘটনা'}</span>
           </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {language === 'en' 
-              ? 'Tap the type of emergency you are experiencing' 
-              : 'আপনি যে ধরনের জরুরি অবস্থার সম্মুখীন তা ট্যাপ করুন'}
-          </p>
         </div>
-        <div className="shrink-0 self-end sm:self-auto">
-          <LanguageToggle />
-        </div>
+        <LanguageToggle />
       </div>
 
-      {/* Offline Indicator */}
-      {!isOnline && (
-        <div className="mx-3 mb-6 flex items-center gap-3 rounded-xl bg-warning/20 p-4 sm:mx-4">
-          <WifiOff className="h-5 w-5 text-warning" />
-          <p className="text-sm font-medium text-warning">
-            {UI_LABELS.offline[language]}
-          </p>
-        </div>
-      )}
-
-      {/* Success Message */}
+      {/* Success Message Overlay */}
       {showSuccess && (
-        <div className="mx-3 mb-6 flex items-center gap-3 rounded-xl bg-safe/20 p-4 sm:mx-4">
-          <CheckCircle className="h-6 w-6 text-safe" />
-          <p className="text-lg font-bold text-safe">
-            {UI_LABELS.reportSent[language]}
-          </p>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-300">
+          <Card className="glass mx-6 flex w-full max-w-xs flex-col items-center justify-center p-8 text-center shadow-2xl animate-in zoom-in-95 duration-300">
+            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-safe/20 text-safe shadow-xl shadow-safe/20">
+              <CheckCircle className="h-10 w-10" />
+            </div>
+            <p className="text-xl font-black text-foreground">
+              {UI_LABELS.reportSent[language]}
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Emergency responders have been notified.
+            </p>
+          </Card>
         </div>
       )}
 
-      {/* Incident Type Buttons */}
-      <div className="mb-8 grid grid-cols-2 gap-3 px-3 sm:gap-4 sm:px-4">
+      {/* Incident Type Grid */}
+      <div className="mb-8 grid grid-cols-2 gap-4 px-3 sm:gap-6 sm:px-4">
         {incidentButtons.map(({ type, icon: Icon, color }) => (
           <button
             key={type}
             onClick={() => setSelectedType(type)}
             className={cn(
-              "flex flex-col items-center justify-center gap-2 rounded-2xl p-4 transition-all duration-200 active:scale-95 sm:gap-3 sm:p-6",
+              "group relative flex flex-col items-center justify-center gap-3 overflow-hidden rounded-3xl p-6 transition-all duration-300 active:scale-95",
               selectedType === type 
-                ? `${color} text-white ring-4 ring-primary/50 scale-[1.02]` 
-                : "bg-secondary text-foreground hover:bg-secondary/80"
+                ? `bg-gradient-to-br ${color} text-white ring-offset-background ring-4 ring-primary shadow-2xl scale-[1.02]` 
+                : "glass text-foreground hover:bg-card/80 border-white/5"
             )}
           >
-            <Icon className="h-10 w-10 sm:h-12 sm:w-12" strokeWidth={1.5} />
-            <span className="text-center text-sm font-bold leading-tight sm:text-lg">
+            {selectedType === type && (
+              <div className="absolute top-0 right-0 p-2">
+                <CheckCircle className="h-4 w-4 text-white/50" />
+              </div>
+            )}
+            <Icon className={cn(
+              "h-12 w-12 transition-transform duration-500 group-hover:scale-110",
+              selectedType === type ? "text-white" : "text-primary"
+            )} strokeWidth={1.5} />
+            <span className="text-center text-sm font-black uppercase tracking-wider leading-tight">
               {INCIDENT_LABELS[type][language]}
             </span>
           </button>
@@ -177,24 +190,21 @@ export function ReportPage() {
 
       {/* Severity Selection */}
       {selectedType && (
-        <div className="mb-8 px-3 sm:px-4">
-          <h3 className="mb-3 text-base font-semibold sm:text-lg">
+        <div className="mb-8 px-3 sm:px-4 animate-in slide-in-from-bottom-4 duration-500">
+          <h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-muted-foreground">
             {language === 'en' ? 'Severity Level' : 'তীব্রতার মাত্রা'}
           </h3>
-          <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
+          <div className="flex gap-2 sm:gap-4">
             {severityButtons.map(({ level, label, color }) => (
               <button
                 key={level}
                 onClick={() => setSelectedSeverity(level)}
                 className={cn(
-                  "w-full rounded-xl px-3 py-2.5 text-sm font-bold transition-all duration-200 sm:flex-1 sm:px-4 sm:py-3",
+                  "flex-1 rounded-2xl px-4 py-4 text-xs font-black uppercase tracking-widest transition-all duration-300",
                   selectedSeverity === level
-                    ? `${color} ${level === 'warning' ? 'text-warning-foreground' : 'text-white'} ring-2 ring-offset-2 ring-offset-background`
-                    : "bg-secondary text-foreground"
+                    ? `${color} ${level === 'warning' ? 'text-warning-foreground' : 'text-white'} shadow-xl ring-2 ring-offset-2 ring-offset-background`
+                    : "glass text-muted-foreground"
                 )}
-                style={{
-                  ringColor: selectedSeverity === level ? `var(--${level})` : undefined
-                }}
               >
                 {label[language]}
               </button>
@@ -203,52 +213,58 @@ export function ReportPage() {
         </div>
       )}
 
-      {/* Location */}
-      <div className="mb-6 px-3 sm:px-4">
-        <Card className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:gap-4">
-          <div className={cn(
-            "flex h-12 w-12 items-center justify-center rounded-xl",
-            userLocation ? "bg-safe/20 text-safe" : "bg-muted text-muted-foreground"
-          )}>
-            {isLocating ? (
-              <Loader2 className="h-6 w-6 animate-spin" />
-            ) : (
-              <MapPin className="h-6 w-6" />
-            )}
+      {/* Location Card */}
+      <div className="mb-8 px-3 sm:px-4">
+        <Card className="glass relative overflow-hidden border-0 p-5 shadow-xl">
+          <div className="flex items-center gap-4">
+            <div className={cn(
+              "flex h-14 w-14 items-center justify-center rounded-2xl shadow-inner transition-colors duration-500",
+              userLocation ? "bg-safe/10 text-safe" : "bg-muted text-muted-foreground"
+            )}>
+              {isLocating ? (
+                <Loader2 className="h-7 w-7 animate-spin" />
+              ) : (
+                <MapPin className="h-7 w-7" />
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+                {UI_LABELS.location[language]}
+              </p>
+              <p className="mt-0.5 truncate text-lg font-bold">
+                {isLocating 
+                  ? UI_LABELS.detectingLocation[language]
+                  : userLocation?.address || `${userLocation?.lat?.toFixed(4)}, ${userLocation?.lng?.toFixed(4)}`
+                }
+              </p>
+            </div>
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={detectLocation}
+              disabled={isLocating}
+              className="rounded-xl glass border-white/10"
+            >
+              <RefreshCw className={cn("h-4 w-4", isLocating && "animate-spin")} />
+            </Button>
           </div>
-          <div className="min-w-0 flex-1">
-            <p className="font-semibold">{UI_LABELS.location[language]}</p>
-            <p className="break-words text-sm text-muted-foreground">
-              {isLocating 
-                ? UI_LABELS.detectingLocation[language]
-                : userLocation?.address || `${userLocation?.lat?.toFixed(4)}, ${userLocation?.lng?.toFixed(4)}`
-              }
-            </p>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={detectLocation}
-            disabled={isLocating}
-            className="shrink-0 self-start sm:self-auto"
-          >
-            {language === 'en' ? 'Refresh' : 'রিফ্রেশ'}
-          </Button>
         </Card>
       </div>
 
       {userLocation && !isLocating && (
-        <NearestShelters language={language} userLat={userLocation.lat} userLng={userLocation.lng} />
+        <div className="mb-8">
+           <NearestShelters language={language} userLat={userLocation.lat} userLng={userLocation.lng} />
+        </div>
       )}
 
       {/* Optional Description */}
       {selectedType && (
-        <div className="mb-6 px-3 sm:px-4">
+        <div className="mb-6 px-3 sm:px-4 animate-in slide-in-from-bottom-4 duration-700">
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder={language === 'en' ? 'Add details (optional)...' : 'বিবরণ যোগ করুন (ঐচ্ছিক)...'}
-            className="w-full rounded-xl border border-border bg-secondary p-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            placeholder={language === 'en' ? 'ADD DETAILS (OPTIONAL)...' : 'বিবরণ যোগ করুন (ঐচ্ছিক)...'}
+            className="w-full rounded-2xl glass border-0 p-5 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm font-medium"
             rows={3}
           />
         </div>
@@ -256,33 +272,33 @@ export function ReportPage() {
 
       {/* Add Photo Button */}
       {selectedType && (
-        <div className="mb-8 px-3 sm:px-4">
+        <div className="mb-10 px-3 sm:px-4 animate-in slide-in-from-bottom-4 duration-700">
           <Button
             variant="outline"
-            className="w-full gap-3 py-5 text-base sm:py-6 sm:text-lg"
+            className="w-full glass border-dashed border-primary/30 h-16 rounded-2xl gap-3 text-sm font-black uppercase tracking-widest"
           >
-            <Camera className="h-6 w-6" />
+            <Camera className="h-5 w-5 text-primary" />
             {UI_LABELS.addPhoto[language]}
           </Button>
         </div>
       )}
 
       {/* Submit Button */}
-      <div className="px-3 sm:px-4">
+      <div className="px-3 sm:px-4 sticky bottom-[calc(6.5rem+env(safe-area-inset-bottom,0px))] z-50">
         <Button
           onClick={handleSubmit}
           disabled={!selectedType || !userLocation || isSending}
           className={cn(
-            "w-full gap-2 py-6 text-lg font-bold transition-all duration-200 sm:gap-3 sm:py-8 sm:text-xl",
+            "w-full h-20 rounded-2xl gap-3 text-lg font-black uppercase tracking-[0.15em] transition-all duration-500 shadow-2xl",
             selectedType 
-              ? "bg-primary hover:bg-primary/90" 
-              : "bg-muted text-muted-foreground"
+              ? "bg-primary hover:bg-primary/90 shadow-primary/40" 
+              : "bg-muted text-muted-foreground shadow-none"
           )}
         >
           {isSending ? (
-            <Loader2 className="h-7 w-7 animate-spin" />
+            <Loader2 className="h-8 w-8 animate-spin" />
           ) : (
-            <Send className="h-7 w-7" />
+            <Send className="h-8 w-8" />
           )}
           {UI_LABELS.sendReport[language]}
         </Button>
@@ -290,3 +306,27 @@ export function ReportPage() {
     </div>
   );
 }
+
+// Sub-component for Refresh icon
+function RefreshCw(props: React.ComponentProps<typeof Loader2>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+      <path d="M21 3v5h-5" />
+      <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+      <path d="M3 21v-5h5" />
+    </svg>
+  );
+}
+
